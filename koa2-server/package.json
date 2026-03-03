@@ -1,0 +1,31 @@
+{
+  "name": "koa2-server",
+  "version": "1.0.0",
+  "description": "Koa2 Node.js RESTful API Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "koa2",
+    "nodejs",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@koa/cors": "^5.0.0",
+    "@koa/router": "^15.3.1",
+    "dotenv": "^17.3.1",
+    "koa": "^3.1.2",
+    "koa-bodyparser": "^4.4.1",
+    "koa-logger": "^4.0.0",
+    "koa-static": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

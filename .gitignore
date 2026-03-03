@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# 环境变量
+.env
+**/.env
+
+# 构建输出
+dist/
+**/dist/
+
+# Capacitor 原生平台（可选，按需取消注释）
+# vue-capacitor-app/ios/
+# vue-capacitor-app/android/
+
+# 日志
+*.log
+npm-debug.log*
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editor
+.vscode/extensions.json
