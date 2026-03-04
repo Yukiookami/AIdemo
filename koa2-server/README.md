@@ -14,7 +14,7 @@
 
 ## 项目结构
 
-```
+```text
 koa2-server/
 ├── src/
 │   ├── app.js          # Koa 应用实例

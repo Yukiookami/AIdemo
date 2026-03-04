@@ -5,7 +5,8 @@ const router = new Router();
 
 /**
  * GET /api/ai/models
- * 获取 Ollama 可用模型列表
+ * 获取 Ollama 当前已拉取的模型列表
+ * 返回格式: { code: 200, data: Model[] }
  */
 router.get("/models", async (ctx) => {
   const { models } = await ollama.list();
@@ -17,8 +18,10 @@ router.get("/models", async (ctx) => {
 
 /**
  * POST /api/ai/chat
- * 普通对话（等待完整响应）
- * Body: { model: string, messages: [{role, content}] }
+ * 普通对话（阵列式，等待完整响应）
+ * Body: { model?: string, messages: [{role, content}] }
+ * 返回格式: { code: 200, data: { model, message, done } }
+ * 注意：该接口当前前端未使用，仅作备用
  */
 router.post("/chat", async (ctx) => {
   const { model = "qwen2.5:32b", messages } = ctx.request.body;
@@ -43,8 +46,15 @@ router.post("/chat", async (ctx) => {
 
 /**
  * POST /api/ai/chat/stream
- * 流式对话（SSE）
- * Body: { model: string, messages: [{role, content}] }
+ * 流式对话（SSE 服务器推送事件）
+ * Body: { model?: string, messages: [{role, content}] }
+ *
+ * 响应格式（每行一个 SSE 事件）:
+ *   data: { content: string, thinking: string, done: boolean }
+ *
+ * - content: 当前 chunk 的文字内容
+ * - thinking: 思考型模型的推理过程（普通模型该字段为空字符串）
+ * - done: 为 true 时表示模型已完成输出
  */
 router.post("/chat/stream", async (ctx) => {
   const { model = "qwen2.5:32b", messages } = ctx.request.body;
@@ -55,7 +65,8 @@ router.post("/chat/stream", async (ctx) => {
     return;
   }
 
-  // 设置 SSE 响应头
+  // 设置 SSE 标准响应头
+  // X-Accel-Buffering: no 用于关闭 Nginx 缓冲，确保内容实时推送到客户端
   ctx.set({
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
@@ -64,15 +75,24 @@ router.post("/chat/stream", async (ctx) => {
   });
   ctx.status = 200;
 
-  const stream = await ollama.chat({ model, messages, stream: true });
+  // 向 Ollama 发起流式对话请求
+  // messages 中若包含 images 字段（base64 数组），Ollama 会自动传给多模态模型
+  // think: true 启用 qwen3 等思考型模型的推理过程输出（thinking 字段）
+  const stream = await ollama.chat({ model, messages, stream: true, think: true });
 
-  // 逐 chunk 写入
+  // 逐 chunk 读取并向客户端写入 SSE 消息
+  // thinking 字段：仅 qwen3 等思考型模型会带有内容，普通模型为空字符串
   for await (const chunk of stream) {
     const content = chunk.message?.content || "";
-    ctx.res.write(`data: ${JSON.stringify({ content, done: chunk.done })}\n\n`);
+    const thinking = chunk.message?.thinking || "";
+    ctx.res.write(
+      `data: ${JSON.stringify({ content, thinking, done: chunk.done })}\n\n`,
+    );
+    // chunk.done=true 表示模型输出完毕，提前跳出循环
     if (chunk.done) break;
   }
 
+  // 关闭 SSE 连接
   ctx.res.end();
 });
 
