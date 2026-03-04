@@ -78,7 +78,12 @@ router.post("/chat/stream", async (ctx) => {
   // 向 Ollama 发起流式对话请求
   // messages 中若包含 images 字段（base64 数组），Ollama 会自动传给多模态模型
   // think: true 启用 qwen3 等思考型模型的推理过程输出（thinking 字段）
-  const stream = await ollama.chat({ model, messages, stream: true, think: true });
+  const stream = await ollama.chat({
+    model,
+    messages,
+    stream: true,
+    think: true,
+  });
 
   // 逐 chunk 读取并向客户端写入 SSE 消息
   // thinking 字段：仅 qwen3 等思考型模型会带有内容，普通模型为空字符串

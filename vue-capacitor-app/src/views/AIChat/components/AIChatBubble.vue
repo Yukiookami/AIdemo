@@ -21,9 +21,9 @@ defineProps<{ message: ChatMessage }>()
 
     <!-- assistant 消息右侧：思考过程 + 气泡 -->
     <div v-if="message.role === 'assistant'" class="assistant-body">
-      <!-- 仅在流式输出中（思考阶段）展示思考框，思考结束后隐藏 -->
+      <!-- 有 thinking 内容时显示：流式中展开，完成后可折叠 -->
       <AIChatThinking
-        v-if="message.streaming"
+        v-if="message.streaming || message.thinking"
         :thinking="message.thinking ?? ''"
         :streaming="message.streaming"
       />
