@@ -126,19 +126,36 @@ defineProps<{ message: ChatMessage }>()
       white-space: normal;
       display: block;
 
-      :deep(p) { margin: 0 0 8px; &:last-child { margin-bottom: 0; } }
-      :deep(h1), :deep(h2), :deep(h3), :deep(h4) {
+      :deep(p) {
+        margin: 0 0 8px;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+      :deep(h1),
+      :deep(h2),
+      :deep(h3),
+      :deep(h4) {
         margin: 12px 0 6px;
         font-weight: 600;
         line-height: 1.3;
       }
-      :deep(h1) { font-size: 1.2em; }
-      :deep(h2) { font-size: 1.1em; }
-      :deep(h3) { font-size: 1em; }
-      :deep(ul), :deep(ol) {
+      :deep(h1) {
+        font-size: 1.2em;
+      }
+      :deep(h2) {
+        font-size: 1.1em;
+      }
+      :deep(h3) {
+        font-size: 1em;
+      }
+      :deep(ul),
+      :deep(ol) {
         margin: 6px 0;
         padding-left: 20px;
-        li { margin: 3px 0; }
+        li {
+          margin: 3px 0;
+        }
       }
       :deep(blockquote) {
         margin: 8px 0;
@@ -162,21 +179,47 @@ defineProps<{ message: ChatMessage }>()
         overflow: hidden;
         background: #f6f8fa;
         border: 1px solid #e5e7eb;
-        code { font-size: 13px; padding: 12px 14px; display: block; overflow-x: auto; }
+        code {
+          font-size: 13px;
+          padding: 12px 14px;
+          display: block;
+          overflow-x: auto;
+        }
       }
       :deep(table) {
         width: 100%;
         border-collapse: collapse;
         margin: 8px 0;
         font-size: 13px;
-        th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left; }
-        th { background: #f3f4f6; font-weight: 600; }
-        tr:nth-child(even) td { background: #f9fafb; }
+        th,
+        td {
+          border: 1px solid #e5e7eb;
+          padding: 6px 10px;
+          text-align: left;
+        }
+        th {
+          background: #f3f4f6;
+          font-weight: 600;
+        }
+        tr:nth-child(even) td {
+          background: #f9fafb;
+        }
       }
-      :deep(hr) { border: none; border-top: 1px solid #e5e7eb; margin: 10px 0; }
-      :deep(a) { color: #2563eb; text-decoration: underline; }
-      :deep(strong) { font-weight: 600; }
-      :deep(em) { font-style: italic; }
+      :deep(hr) {
+        border: none;
+        border-top: 1px solid #e5e7eb;
+        margin: 10px 0;
+      }
+      :deep(a) {
+        color: #2563eb;
+        text-decoration: underline;
+      }
+      :deep(strong) {
+        font-weight: 600;
+      }
+      :deep(em) {
+        font-style: italic;
+      }
     }
 
     .cursor {

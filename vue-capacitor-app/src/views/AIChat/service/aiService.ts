@@ -44,7 +44,9 @@ export const chatStream = async (
   let buffer = ''
 
   // abort 时主动取消 reader
-  signal?.addEventListener('abort', () => { reader.cancel().catch(() => {}) })
+  signal?.addEventListener('abort', () => {
+    reader.cancel().catch(() => {})
+  })
 
   while (true) {
     const { done, value } = await reader.read()

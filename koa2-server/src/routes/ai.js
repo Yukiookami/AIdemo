@@ -92,9 +92,19 @@ router.post("/chat/stream", async (ctx) => {
 
   let stream;
   try {
-    stream = await ollama.chat({ model, messages: finalMessages, stream: true, think });
+    stream = await ollama.chat({
+      model,
+      messages: finalMessages,
+      stream: true,
+      think,
+    });
   } catch {
-    stream = await ollama.chat({ model, messages: finalMessages, stream: true, think: false });
+    stream = await ollama.chat({
+      model,
+      messages: finalMessages,
+      stream: true,
+      think: false,
+    });
   }
 
   // 逐 chunk 读取并向客户端写入 SSE 消息

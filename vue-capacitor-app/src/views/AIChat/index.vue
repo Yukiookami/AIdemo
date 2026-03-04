@@ -32,11 +32,7 @@ const {
   <AIChatLayout>
     <!-- 顶部栏 -->
     <template #header>
-      <AIChatHeader
-        :models="models"
-        v-model:model="currentModel"
-        @clear="clearMessages"
-      />
+      <AIChatHeader :models="models" v-model:model="currentModel" @clear="clearMessages" />
     </template>
 
     <!-- 消息列表（占满剩余空间） -->

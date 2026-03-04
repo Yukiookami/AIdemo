@@ -11,7 +11,7 @@ import DOMPurify from 'dompurify'
 // 配置 marked：使用 highlight.js 做代码块语法高亮
 marked.setOptions({
   breaks: true, // 单个换行符转为 <br>
-  gfm: true,    // 启用 GitHub Flavored Markdown
+  gfm: true, // 启用 GitHub Flavored Markdown
 })
 
 // 自定义 renderer：代码块高亮
@@ -33,11 +33,33 @@ export const renderMarkdown = (text: string): string => {
   return DOMPurify.sanitize(raw, {
     // 允许 hljs 用到的 class，以及常见 HTML 标签
     ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'del', 'code', 'pre',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'hr',
-      'table', 'thead', 'tbody', 'tr', 'th', 'td',
-      'a', 'img', 'span',
+      'p',
+      'br',
+      'strong',
+      'em',
+      'del',
+      'code',
+      'pre',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'hr',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'th',
+      'td',
+      'a',
+      'img',
+      'span',
     ],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'class', 'target', 'rel'],
   })

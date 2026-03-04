@@ -71,18 +71,18 @@
 
 ### 前端 `vue-capacitor-app`
 
-| 分类       | 依赖                                   | 版本        |
-| ---------- | -------------------------------------- | ----------- |
-| 框架       | Vue 3                                  | ^3.5.29     |
-| 语言       | TypeScript                             | ~5.9.3      |
-| 构建       | Vite                                   | ^7.x        |
-| 路由       | Vue Router                             | ^5.0.3      |
-| 状态管理   | Pinia                                  | ^3.0.4      |
-| UI 组件库  | Vant                                   | ^4.9.22     |
-| 图标       | @iconify/vue + @iconify-icons/mingcute | ^5 / ^1.2.9 |
-| Markdown   | marked + highlight.js + DOMPurify     | ^17 / ^11 / ^3 |
-| 样式       | sass-embedded (SCSS)                   | ^1.97.3     |
-| 跨平台打包 | Capacitor                              | ^8.1.0      |
+| 分类       | 依赖                                   | 版本           |
+| ---------- | -------------------------------------- | -------------- |
+| 框架       | Vue 3                                  | ^3.5.29        |
+| 语言       | TypeScript                             | ~5.9.3         |
+| 构建       | Vite                                   | ^7.x           |
+| 路由       | Vue Router                             | ^5.0.3         |
+| 状态管理   | Pinia                                  | ^3.0.4         |
+| UI 组件库  | Vant                                   | ^4.9.22        |
+| 图标       | @iconify/vue + @iconify-icons/mingcute | ^5 / ^1.2.9    |
+| Markdown   | marked + highlight.js + DOMPurify      | ^17 / ^11 / ^3 |
+| 样式       | sass-embedded (SCSS)                   | ^1.97.3        |
+| 跨平台打包 | Capacitor                              | ^8.1.0         |
 
 ### 后端 `koa2-server`
 

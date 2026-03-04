@@ -126,7 +126,7 @@ const onActionSelect = (action: { value: string }) => {
         class="send-btn"
         :class="{ 'send-btn--stop': isLoading }"
         round
-        :disabled="!isLoading && (!modelValue.trim() && !pendingImages.length)"
+        :disabled="!isLoading && !modelValue.trim() && !pendingImages.length"
         @click="isLoading ? emit('stop') : onSendClick()"
       >
         <span v-if="isLoading" class="stop-icon" />
