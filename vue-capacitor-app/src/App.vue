@@ -5,11 +5,7 @@ import MainLayout from './components/layout/mainLayout.vue'
 
 <template>
   <MainLayout>
-    <template #header></template>
-
     <RouterView />
-
-    <template #footer></template>
   </MainLayout>
 </template>
 
@@ -23,7 +19,12 @@ import MainLayout from './components/layout/mainLayout.vue'
 html,
 body,
 #app {
-  height: 100%;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 </style>

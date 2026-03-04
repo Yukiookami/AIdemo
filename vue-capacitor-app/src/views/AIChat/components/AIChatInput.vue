@@ -58,7 +58,6 @@ const onActionSelect = (action: { value: string }) => {
 
 <template>
   <div class="input-wrapper">
-    <!-- 图片预览横向滚动行 -->
     <div v-if="pendingImages.length" class="image-preview-row">
       <div v-for="(img, idx) in pendingImages" :key="idx" class="preview-item">
         <img :src="`data:image/jpeg;base64,${img}`" class="preview-thumb" />
@@ -134,6 +133,7 @@ const onActionSelect = (action: { value: string }) => {
 .input-wrapper {
   background: #fff;
   border-top: 1px solid #f0f0f0;
+  padding-bottom: 0;
 
   .image-preview-row {
     display: flex;
@@ -184,7 +184,7 @@ const onActionSelect = (action: { value: string }) => {
     display: flex;
     align-items: flex-end;
     gap: 6px;
-    padding: 10px 12px 10px;
+    padding: 8px 12px 4px;
 
     // 附图 icon 按钮
     .icon-btn {

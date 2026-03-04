@@ -5,6 +5,7 @@
 -->
 <script setup lang="ts">
 import { useAIChat } from './composables/useAIChat'
+import AIChatLayout from './components/AIChatLayout.vue'
 import AIChatHeader from './components/AIChatHeader.vue'
 import AIChatMessages from './components/AIChatMessages.vue'
 import AIChatPresets from './components/AIChatPresets.vue'
@@ -26,35 +27,27 @@ const {
 </script>
 
 <template>
-  <!-- 页面最外层容器：全屏垂直布局 -->
-  <div class="chat-page">
-    <!-- 顶部栏：模型名称 + 清空按钮 -->
-    <AIChatHeader :models="models" v-model:model="currentModel" @clear="clearMessages" />
+  <AIChatLayout>
+    <!-- 顶部栏 -->
+    <template #header>
+      <AIChatHeader :models="models" v-model:model="currentModel" @clear="clearMessages" />
+    </template>
 
-    <!-- 消息列表区：占满剩余空间，内部可滚动 -->
+    <!-- 消息列表（占满剩余空间） -->
     <AIChatMessages :messages="messages" />
 
-    <!-- 预设提示词快捷按钮区 -->
-    <AIChatPresets :presets="presets" :active-preset="activePreset" @select="usePreset" />
-
-    <!-- 底部输入区：消息输入框 + 图片按钮 + 发送按钮 -->
-    <AIChatInput
-      v-model="inputText"
-      :is-loading="isLoading"
-      :pending-images="pendingImages"
-      @send="sendMessage()"
-      @add-image="(b64) => pendingImages.push(b64)"
-      @remove-image="(idx) => pendingImages.splice(idx, 1)"
-    />
-  </div>
+    <!-- 底部：预设 + 输入框 -->
+    <template #footer>
+      <AIChatPresets :presets="presets" :active-preset="activePreset" @select="usePreset" />
+      <AIChatInput
+        v-model="inputText"
+        :is-loading="isLoading"
+        :pending-images="pendingImages"
+        @send="sendMessage()"
+        @add-image="(b64) => pendingImages.push(b64)"
+        @remove-image="(idx) => pendingImages.splice(idx, 1)"
+      />
+    </template>
+  </AIChatLayout>
 </template>
 
-<style scoped lang="scss">
-.chat-page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: #f9fafb;
-  overflow: hidden;
-}
-</style>

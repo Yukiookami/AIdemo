@@ -6,6 +6,15 @@
 
 ## 版本履历
 
+### v0.5.0 — iOS 适配 + 布局重构 + Thinking 优化
+
+- 📱 **iOS 安全区适配**：新增 `AIChatLayout.vue` 布局组件，使用 `position:fixed` + `top: env(safe-area-inset-top)` 精确处理刘海/Home 条，彻底解决高度超出和 footer 不显示的问题
+- 🏗️ **布局重构**：将布局逻辑从 `index.vue` 中剥离，抽取为独立 `AIChatLayout.vue`，header/content/footer 三区域 flex 分配职责清晰
+- 🧠 **Thinking 展示优化**：流式思考结束后折叠为「💭 已深度思考」，点击可展开查看完整推理过程，不再直接消失
+- ✅ **开启模型 Thinking**：后端 Ollama 请求加入 `think: true`，`qwen3` 系列模型现在会正确输出思考过程
+- 📐 **viewport 修正**：`index.html` 加入 `viewport-fit=cover`，`capacitor.config.ts` 设为 `contentInset: 'always'`
+- 🏷️ **预设调整**：「中译日（商务）」调至第二位，图标改为 💼
+
 ### v0.4.0 — UI 全面接入 Vant + Iconify
 
 - 🎨 引入 Vant 4 组件库，全面替换原生 HTML 元素
@@ -80,10 +89,11 @@ AIdemo/
 │   ├── src/
 │   │   ├── views/AIChat/
 │   │   │   ├── components/       # UI 子组件
+│   │   │   │   ├── AIChatLayout.vue      # 布局容器（safe area / flex 分区）
 │   │   │   │   ├── AIChatHeader.vue      # 顶部栏（模型选择 + 清空）
 │   │   │   │   ├── AIChatMessages.vue    # 消息列表
 │   │   │   │   ├── AIChatBubble.vue      # 单条消息气泡
-│   │   │   │   ├── AIChatThinking.vue    # AI 思考过程展示
+│   │   │   │   ├── AIChatThinking.vue    # AI 思考过程展示（流式/折叠）
 │   │   │   │   ├── AIChatPresets.vue     # 预设提示词标签
 │   │   │   │   └── AIChatInput.vue       # 底部输入区
 │   │   │   ├── composables/      # 逻辑层

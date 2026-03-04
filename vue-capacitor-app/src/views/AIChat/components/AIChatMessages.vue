@@ -46,7 +46,8 @@ watch(
 
 <style scoped lang="scss">
 .messages {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   padding: 16px;
   display: flex;
