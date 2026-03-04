@@ -1,10 +1,10 @@
 <!--
   @file AIChatLayout.vue
   @description AI 对话页布局容器
-  负责全屏高度控制和 header / content / footer 三区域的 flex 布局
-  - header slot：固定高度，不伸缩
-  - default slot（content）：flex:1，占满剩余空间，内部可滚动
-  - footer slot：固定高度，不伸缩
+  使用 JS 动态注入的 --vh 变量 + -webkit-fill-available 修复 iOS 真机视口偏差。
+  - header slot：sticky 顶部，固定高度
+  - default slot（content）：剩余高度，内部可滚动
+  - footer slot：sticky 底部，高度自适应
 -->
 <template>
   <div class="chat-layout">
@@ -24,23 +24,26 @@
 
 <script setup lang="ts"></script>
 
-<style scoped lang="scss">
+<style scoped>
 .chat-layout {
-  display: flex;
-  flex-direction: column;
   position: fixed;
-  top: env(safe-area-inset-top);
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  background: #f9fafb;
 }
 
-.chat-layout__header,
-.chat-layout__footer {
+.chat-layout__header {
   flex-shrink: 0;
   width: 100%;
+  /* 顶部安全区：让 header 背景延伸到刘海/动态岛后面 */
+  padding-top: env(safe-area-inset-top);
+  background: #fff;
+  box-sizing: border-box;
 }
 
 .chat-layout__content {
@@ -50,5 +53,14 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.chat-layout__footer {
+  flex-shrink: 0;
+  width: 100%;
+  /* 底部安全区：确保 input 在 home indicator 上方可点击 */
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #fff;
+  box-sizing: border-box;
 }
 </style>

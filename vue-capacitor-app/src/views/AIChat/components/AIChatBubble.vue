@@ -7,6 +7,8 @@
 <script setup lang="ts">
 import type { ChatMessage } from '../types/index'
 import AIChatThinking from './AIChatThinking.vue'
+import { renderMarkdown } from '../composables/useMarkdown'
+import 'highlight.js/styles/github.css'
 
 defineProps<{ message: ChatMessage }>()
 </script>
@@ -23,13 +25,13 @@ defineProps<{ message: ChatMessage }>()
     <div v-if="message.role === 'assistant'" class="assistant-body">
       <!-- 有 thinking 内容时显示：流式中展开，完成后可折叠 -->
       <AIChatThinking
-        v-if="message.streaming || message.thinking"
+        v-if="message.streaming || message.thinking?.trim()"
         :thinking="message.thinking ?? ''"
         :streaming="message.streaming"
       />
       <!-- 气泡主体 -->
       <div class="bubble">
-        <span class="content">{{ message.content }}</span>
+        <span class="content markdown-body" v-html="renderMarkdown(message.content)"></span>
         <span v-if="message.streaming" class="cursor"></span>
       </div>
     </div>
@@ -118,6 +120,64 @@ defineProps<{ message: ChatMessage }>()
     line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
+
+    // assistant 气泡内的 markdown 渲染内容
+    .markdown-body {
+      white-space: normal;
+      display: block;
+
+      :deep(p) { margin: 0 0 8px; &:last-child { margin-bottom: 0; } }
+      :deep(h1), :deep(h2), :deep(h3), :deep(h4) {
+        margin: 12px 0 6px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      :deep(h1) { font-size: 1.2em; }
+      :deep(h2) { font-size: 1.1em; }
+      :deep(h3) { font-size: 1em; }
+      :deep(ul), :deep(ol) {
+        margin: 6px 0;
+        padding-left: 20px;
+        li { margin: 3px 0; }
+      }
+      :deep(blockquote) {
+        margin: 8px 0;
+        padding: 6px 12px;
+        border-left: 3px solid #d1d5db;
+        color: #6b7280;
+        background: #f9fafb;
+        border-radius: 0 6px 6px 0;
+      }
+      :deep(code):not(pre code) {
+        background: #e5e7eb;
+        color: #dc2626;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.88em;
+        font-family: 'Menlo', 'Monaco', monospace;
+      }
+      :deep(.hljs-pre) {
+        margin: 8px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f6f8fa;
+        border: 1px solid #e5e7eb;
+        code { font-size: 13px; padding: 12px 14px; display: block; overflow-x: auto; }
+      }
+      :deep(table) {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8px 0;
+        font-size: 13px;
+        th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left; }
+        th { background: #f3f4f6; font-weight: 600; }
+        tr:nth-child(even) td { background: #f9fafb; }
+      }
+      :deep(hr) { border: none; border-top: 1px solid #e5e7eb; margin: 10px 0; }
+      :deep(a) { color: #2563eb; text-decoration: underline; }
+      :deep(strong) { font-weight: 600; }
+      :deep(em) { font-style: italic; }
+    }
 
     .cursor {
       display: inline-block;

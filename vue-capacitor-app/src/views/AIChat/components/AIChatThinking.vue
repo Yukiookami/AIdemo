@@ -48,8 +48,8 @@ watch(
     </div>
   </div>
 
-  <!-- 思考完成：可折叠展示 -->
-  <div v-else-if="props.thinking" class="thinking-done">
+  <!-- 思考完成：可折叠展示（thinking 必须有实际内容，非纯空白） -->
+  <div v-else-if="props.thinking?.trim()" class="thinking-done">
     <div class="thinking-done-header" @click="expanded = !expanded">
       <span class="thinking-done-icon">💭</span>
       <span class="thinking-done-label">已深度思考</span>

@@ -53,7 +53,7 @@ const onPointerUp = (e: PointerEvent, prompt: string): void => {
   padding: 8px 16px;
   overflow-x: auto;
   scrollbar-width: none;
-  // 明确声明横向滚动，阻止子元素吃掉 pan-x 手势
+  // 明确声明横向滚动，覆盖全局的 manipulation
   touch-action: pan-x;
 
   &::-webkit-scrollbar {

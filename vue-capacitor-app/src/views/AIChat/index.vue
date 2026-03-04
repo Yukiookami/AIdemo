@@ -20,7 +20,9 @@ const {
   presets,
   activePreset,
   pendingImages,
+  enableThink,
   sendMessage,
+  stopGeneration,
   usePreset,
   clearMessages,
 } = useAIChat()
@@ -30,7 +32,11 @@ const {
   <AIChatLayout>
     <!-- 顶部栏 -->
     <template #header>
-      <AIChatHeader :models="models" v-model:model="currentModel" @clear="clearMessages" />
+      <AIChatHeader
+        :models="models"
+        v-model:model="currentModel"
+        @clear="clearMessages"
+      />
     </template>
 
     <!-- 消息列表（占满剩余空间） -->
@@ -43,11 +49,12 @@ const {
         v-model="inputText"
         :is-loading="isLoading"
         :pending-images="pendingImages"
+        v-model:enable-think="enableThink"
         @send="sendMessage()"
+        @stop="stopGeneration()"
         @add-image="(b64) => pendingImages.push(b64)"
         @remove-image="(idx) => pendingImages.splice(idx, 1)"
       />
     </template>
   </AIChatLayout>
 </template>
-

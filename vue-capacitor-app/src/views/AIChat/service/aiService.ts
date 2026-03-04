@@ -16,17 +16,22 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
  * @param messages - 对话历史消息列表（仅传 role、content、images）
  * @param onChunk - 每收到一个文本片段时的回调，thinking 为思考过程，done 为 true 表示本次回答结束
  * @param model - 指定使用的模型名称，不传则由后端使用默认模型
- * @throws 当 HTTP 响应状态非 2xx 时抛出错误
+ * @param think - 是否开启深度思考
+ * @param signal - AbortSignal，传入后可随时中断请求
+ * @throws 当 HTTP 响应状态非 2xx 时抛出错误；abort 时静默退出
  */
 export const chatStream = async (
   messages: Pick<ChatMessage, 'role' | 'content' | 'images'>[],
   onChunk: (content: string, done: boolean, thinking?: string) => void,
   model?: string,
+  think?: boolean,
+  signal?: AbortSignal,
 ): Promise<void> => {
   const response = await fetch(`${API_BASE}/api/ai/chat/stream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages }),
+    body: JSON.stringify({ model, messages, think }),
+    signal,
   })
 
   if (!response.ok) {
@@ -38,9 +43,13 @@ export const chatStream = async (
   // 用于拼接跨 chunk 的不完整 SSE 行
   let buffer = ''
 
+  // abort 时主动取消 reader
+  signal?.addEventListener('abort', () => { reader.cancel().catch(() => {}) })
+
   while (true) {
     const { done, value } = await reader.read()
     if (done) break
+    if (signal?.aborted) break
 
     // 将二进制流解码为字符串并追加到缓冲区
     buffer += decoder.decode(value, { stream: true })

@@ -57,7 +57,7 @@ router.post("/chat", async (ctx) => {
  * - done: 为 true 时表示模型已完成输出
  */
 router.post("/chat/stream", async (ctx) => {
-  const { model = "qwen2.5:32b", messages } = ctx.request.body;
+  const { model = "qwen2.5:32b", messages, think = true } = ctx.request.body;
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     ctx.status = 400;
@@ -77,13 +77,25 @@ router.post("/chat/stream", async (ctx) => {
 
   // 向 Ollama 发起流式对话请求
   // messages 中若包含 images 字段（base64 数组），Ollama 会自动传给多模态模型
-  // think: true 启用 qwen3 等思考型模型的推理过程输出（thinking 字段）
-  const stream = await ollama.chat({
-    model,
-    messages,
-    stream: true,
-    think: true,
-  });
+  // think 参数由前端控制传入；若模型不支持该参数导致报错，自动降级为不带 think 重试
+  // 同时：当 think=false 时，在最后一条 user 消息末尾注入 /no_think 指令
+  // qwen3 系列通过该 token 关闭思考，比 think 参数更可靠
+  let finalMessages = messages;
+  if (!think) {
+    finalMessages = messages.map((msg, idx) => {
+      if (idx === messages.length - 1 && msg.role === "user") {
+        return { ...msg, content: msg.content + " /no_think" };
+      }
+      return msg;
+    });
+  }
+
+  let stream;
+  try {
+    stream = await ollama.chat({ model, messages: finalMessages, stream: true, think });
+  } catch {
+    stream = await ollama.chat({ model, messages: finalMessages, stream: true, think: false });
+  }
 
   // 逐 chunk 读取并向客户端写入 SSE 消息
   // thinking 字段：仅 qwen3 等思考型模型会带有内容，普通模型为空字符串

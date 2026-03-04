@@ -44,6 +44,13 @@ export const useAIChat = () => {
   const activePreset = ref<string | null>(null)
 
   /**
+   * 是否开启深度思考模式（仅对支持 think 参数的模型生效，如 qwen3）
+   * - 默认开启
+   * - 有激活预设时自动禁用，避免翻译等场景无限推理
+   */
+  const enableThink = ref(true)
+
+  /**
    * 用户尚未发送的待附图片列表（纯 base64 字符串，不含 data URI 前缀）
    * 发送后自动清空
    */
@@ -89,6 +96,16 @@ export const useAIChat = () => {
    */
   const genId = (): string => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
+  /** 当前流式请求的 AbortController，用于支持中途停止生成 */
+  const abortController = ref<AbortController | null>(null)
+
+  /**
+   * 停止当前正在进行的 AI 生成
+   */
+  const stopGeneration = (): void => {
+    abortController.value?.abort()
+  }
+
   /**
    * 发送消息并触发流式 AI 回复
    *
@@ -107,6 +124,9 @@ export const useAIChat = () => {
 
     inputText.value = ''
     isLoading.value = true
+
+    const controller = new AbortController()
+    abortController.value = controller
 
     // ---- 消息列表操作 ----
 
@@ -141,12 +161,11 @@ export const useAIChat = () => {
       // ---- 拼装发送给后端的消息数组 ----
       const requestMessages: { role: string; content: string }[] = []
 
-      // 固定注入默认 Shiro system prompt（始终生效）
-      requestMessages.push({ role: 'system', content: DEFAULT_SYSTEM_PROMPT })
-
-      // 如果用户还额外激活了某个预设（翻译等任务型），追加在后面叠加生效
+      // 无预设时注入 Shiro 人设；有预设时只注入预设指令，避免人设与任务指令冲突
       if (activePreset.value) {
         requestMessages.push({ role: 'system', content: activePreset.value })
+      } else {
+        requestMessages.push({ role: 'system', content: DEFAULT_SYSTEM_PROMPT })
       }
 
       // 将界面展示的全部历史消息一并发出（过滤掉还在流式中的占位条）
@@ -157,8 +176,9 @@ export const useAIChat = () => {
           .filter((m) => !m.streaming)
           .map(({ role, content, images }) => ({ role, content, ...(images ? { images } : {}) })),
       )
-      // 发起流式请求
-      // 回调参数：chunk=当前内容片段  done=是否完成  thinking=思考文字（思考型模型才有）
+
+      // 发起流式请求，使用用户当前手动设置的深度思考开关值
+      const shouldThink = enableThink.value
       await chatStream(
         requestMessages as Parameters<typeof chatStream>[0],
         (chunk, done, thinking) => {
@@ -172,14 +192,21 @@ export const useAIChat = () => {
           if (done) messages.value[assistantIndex]!.streaming = false
         },
         currentModel.value,
+        shouldThink,
+        controller.signal,
       )
     } catch (err) {
-      // 网络错误、超时等异常情况：将错误信息展示在占位消息里
-      messages.value[assistantIndex]!.content = `请求失败：${(err as Error).message}`
-      messages.value[assistantIndex]!.streaming = false
+      if ((err as Error).name === 'AbortError') {
+        // 用户主动中断，静默处理
+        messages.value[assistantIndex]!.streaming = false
+      } else {
+        messages.value[assistantIndex]!.content =
+          messages.value[assistantIndex]!.content || `请求失败：${(err as Error).message}`
+        messages.value[assistantIndex]!.streaming = false
+      }
     } finally {
-      // 无论成功还是失败，都解除加载状态
       isLoading.value = false
+      abortController.value = null
     }
   }
 
@@ -191,7 +218,11 @@ export const useAIChat = () => {
    * @param prompt - 预设的提示词内容
    */
   const usePreset = (prompt: string): void => {
-    activePreset.value = activePreset.value === prompt ? null : prompt
+    const isDeselect = activePreset.value === prompt
+    activePreset.value = isDeselect ? null : prompt
+    // 选中预设时自动关闭深度思考（防止翻译等场景无限推理）
+    // 取消预设时自动恢复开启，用户可在此基础上手动覆盖
+    enableThink.value = isDeselect
   }
 
   /**
@@ -213,7 +244,9 @@ export const useAIChat = () => {
     presets,
     activePreset,
     pendingImages,
+    enableThink,
     sendMessage,
+    stopGeneration,
     usePreset,
     clearMessages,
   }

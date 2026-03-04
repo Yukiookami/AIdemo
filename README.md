@@ -6,6 +6,21 @@
 
 ## 版本履历
 
+### v0.7.0 — Markdown 渲染 + 深度思考开关 + 停止生成
+
+- 📝 **Markdown 渲染**：assistant 消息支持完整 Markdown 渲染（段落、标题、列表、引用、表格、代码块），代码块使用 highlight.js 语法高亮（GitHub 主题），DOMPurify 清洗 HTML 防 XSS
+- 🧠 **深度思考开关**：输入框上方新增"深度思考"胶囊 toggle，默认开启可手动关闭；点击预设时自动关闭深度思考，取消预设时自动恢复开启，用户可在此基础上手动覆盖
+- ⏹️ **停止生成**：发送按钮在 AI 生成中变为红色停止按钮（■），点击立即中断 SSE 流，已输出内容保留；基于 `AbortController` + `fetch signal` 实现
+- 🔧 **思考展示修复**：关闭深度思考时即使 Ollama 返回空白 thinking 字段也不再显示"已深度思考"（`.trim()` 过滤空白字符误触发）
+- 🔧 **模型兼容性**：后端不再使用固定白名单，先尝试传 `think` 参数，不支持的模型自动降级重试；`think: false` 时同步注入 `/no_think` token 双重保障关闭 qwen3 思考
+
+### v0.6.0 — 应用重命名 + 输入区修复 + 禁止缩放
+
+- 🏷️ **应用重命名**：App 名称改为 **Shiro AI Chat**（`capacitor.config.ts`、`index.html`、`AIChatHeader.vue`、`ios/App/App/Info.plist`）；`Info.plist` 添加相机、麦克风、相册权限
+- 🖱️ **输入区可点击修复**：根因为 Vant DropdownMenu 遮罩层在 Capacitor fixed 布局上下文中遮挡输入框；修复：`<DropdownItem>` 添加 `teleport-to="body"` 脱离层叠上下文；移除 `contentInset: 'always'`（与手动 safe-area padding 双重计算）
+- 🌀 **翻译预设无限思考修复**：有预设激活时只注入预设 system prompt，不注入 Shiro 人设（二者冲突导致模型无限推理）
+- 🔍 **禁用双击缩放**：viewport meta 加入 `user-scalable=no`，全局 `touch-action: manipulation`
+
 ### v0.5.0 — iOS 适配 + 布局重构 + Thinking 优化
 
 - 📱 **iOS 安全区适配**：新增 `AIChatLayout.vue` 布局组件，使用 `position:fixed` + `top: env(safe-area-inset-top)` 精确处理刘海/Home 条，彻底解决高度超出和 footer 不显示的问题
@@ -65,6 +80,7 @@
 | 状态管理   | Pinia                                  | ^3.0.4      |
 | UI 组件库  | Vant                                   | ^4.9.22     |
 | 图标       | @iconify/vue + @iconify-icons/mingcute | ^5 / ^1.2.9 |
+| Markdown   | marked + highlight.js + DOMPurify     | ^17 / ^11 / ^3 |
 | 样式       | sass-embedded (SCSS)                   | ^1.97.3     |
 | 跨平台打包 | Capacitor                              | ^8.1.0      |
 
@@ -99,6 +115,7 @@ AIdemo/
 │   │   │   ├── composables/      # 逻辑层
 │   │   │   │   ├── useAIChat.ts          # 核心对话状态逻辑
 │   │   │   │   ├── useAIChatInput.ts     # 输入区逻辑
+│   │   │   │   ├── useMarkdown.ts        # Markdown 渲染（marked + hljs + DOMPurify）
 │   │   │   │   └── presets.ts            # 默认人格 + 预设提示词配置
 │   │   │   ├── service/
 │   │   │   │   └── aiService.ts          # HTTP/SSE 客户端

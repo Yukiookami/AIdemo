@@ -49,6 +49,8 @@ watch(
   flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
+  /* 覆盖全局 manipulation，恢复纵向滚动 */
+  touch-action: pan-y;
   padding: 16px;
   display: flex;
   flex-direction: column;

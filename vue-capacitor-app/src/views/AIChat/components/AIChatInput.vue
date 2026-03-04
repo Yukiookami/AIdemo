@@ -20,13 +20,16 @@ defineProps<{
   modelValue: string
   isLoading: boolean
   pendingImages: string[]
+  enableThink: boolean
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   send: []
+  stop: []
   'add-image': [base64: string]
   'remove-image': [index: number]
+  'update:enable-think': [value: boolean]
 }>()
 
 const {
@@ -65,6 +68,18 @@ const onActionSelect = (action: { value: string }) => {
           <Icon :icon="closeCircleFill" width="18" />
         </VanButton>
       </div>
+    </div>
+
+    <!-- 深度思考 toggle + 输入行 -->
+    <div class="toolbar">
+      <button
+        class="think-toggle"
+        :class="{ 'think-toggle--on': enableThink }"
+        @click="emit('update:enable-think', !enableThink)"
+      >
+        <span class="think-toggle__dot" />
+        <span class="think-toggle__label">深度思考</span>
+      </button>
     </div>
 
     <!-- 输入行 -->
@@ -106,14 +121,15 @@ const onActionSelect = (action: { value: string }) => {
         @keydown="onKeydown"
       />
 
-      <!-- 发送按钮（van-button） -->
+      <!-- 发送 / 停止按鈕 -->
       <VanButton
         class="send-btn"
+        :class="{ 'send-btn--stop': isLoading }"
         round
-        :disabled="(!modelValue.trim() && !pendingImages.length) || isLoading"
-        @click="onSendClick"
+        :disabled="!isLoading && (!modelValue.trim() && !pendingImages.length)"
+        @click="isLoading ? emit('stop') : onSendClick()"
       >
-        <span v-if="isLoading" class="loading-dots"><i /><i /><i /></span>
+        <span v-if="isLoading" class="stop-icon" />
         <Icon v-else :icon="sendPlaneFill" width="20" />
       </VanButton>
     </div>
@@ -176,6 +192,54 @@ const onActionSelect = (action: { value: string }) => {
           padding: 0;
           line-height: 1;
         }
+      }
+    }
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    padding: 6px 14px 0;
+    gap: 8px;
+  }
+
+  .think-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px 3px 6px;
+    border-radius: 20px;
+    border: 1.5px solid #e5e7eb;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+
+    &__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d1d5db;
+      transition: background 0.2s;
+    }
+
+    &__label {
+      font-size: 12px;
+      color: #9ca3af;
+      transition: color 0.2s;
+      user-select: none;
+    }
+
+    &--on {
+      border-color: #a5b4fc;
+      background: #eef2ff;
+
+      .think-toggle__dot {
+        background: #6366f1;
+      }
+
+      .think-toggle__label {
+        color: #6366f1;
       }
     }
   }
@@ -243,7 +307,7 @@ const onActionSelect = (action: { value: string }) => {
       }
     }
 
-    // 发送按钮
+    // 发送 / 停止按钮
     .send-btn {
       flex-shrink: 0;
       width: 40px !important;
@@ -252,6 +316,7 @@ const onActionSelect = (action: { value: string }) => {
       background: #2563eb !important;
       border: none !important;
       color: #fff;
+      transition: background 0.2s;
 
       &:not(:disabled):active {
         transform: scale(0.92);
@@ -262,47 +327,25 @@ const onActionSelect = (action: { value: string }) => {
         opacity: 1 !important;
       }
 
+      // loading 时变红，表示可停止
+      &--stop {
+        background: #ef4444 !important;
+      }
+
       :deep(.van-button__content) {
         padding: 0;
         line-height: 1;
       }
 
-      // 三点加载动画
-      .loading-dots {
-        display: flex;
-        gap: 3px;
-        align-items: center;
-
-        i {
-          display: block;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: #fff;
-          animation: dot-bounce 1.2s ease-in-out infinite;
-
-          &:nth-child(2) {
-            animation-delay: 0.2s;
-          }
-          &:nth-child(3) {
-            animation-delay: 0.4s;
-          }
-        }
+      // 停止图标：白色小圆角矩形
+      .stop-icon {
+        display: block;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        background: #fff;
       }
     }
-  }
-}
-
-@keyframes dot-bounce {
-  0%,
-  80%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: translateY(-4px);
-    opacity: 1;
   }
 }
 </style>
